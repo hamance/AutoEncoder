@@ -1,8 +1,10 @@
 """Configurations & parameters."""
 
-
+import platform
 
 class Config:
+
+    dataset = 'coco'
 
     datapath = ''
 
@@ -12,5 +14,8 @@ class Config:
 
     learning_rate = 1e-3
 
+    coco_dir = './data/images'
+
+    input_json = './data/cocotalk.json'
 
 opt = Config()
