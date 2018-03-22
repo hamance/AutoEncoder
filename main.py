@@ -17,7 +17,10 @@ def to_img(x):
     return x
 
 
-def main():
+def main(**kwargs):
+    opt.parse(kwargs)
+    opt.show()
+    
     model = autoencoder().cuda()
     criterion = nn.MSELoss()
     optimizer = t.optim.Adam(model.parameters(), lr=opt.learning_rate, weight_decay=1e-5)
@@ -43,4 +46,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import fire
+    fire.Fire(main)
