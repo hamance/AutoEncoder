@@ -47,7 +47,12 @@ class COCO(Dataset):
         #     img = self.transform(I)
         # return img
         img = self.data[index]
-        I = Image.open(img)
+        I = Image.open(img).convert('RGB')
+        # import ipdb; ipdb.set_trace()
+        # if len(I.size) == 2:
+        #     I = np.asarray(I)
+        #     I = I[:,:,np.newaxis]
+        #     I = np.concatenate((I, I, I), axis=2)
         if self.transform is not None:
             I = self.transform(I)
         return I, t.FloatTensor([0])
@@ -107,3 +112,22 @@ def get_loader(opt):
     #     return get_fashion_mnist_loader(opt)
     elif opt.dataset == 'coco':
         return get_coco_loader(opt)
+
+
+
+if __name__ == '__main__':
+    import fire
+    from config import opt
+
+    opt.coco_dir = 'g:\\image_caption\\zips\\coco\\2014'
+    opt.input_json = 'g:\\image_caption\\coco\\lrt\\cocotalk.json'
+    opt.batch_size = 1
+    
+    coco_loader = get_coco_loader(opt)
+    
+    for tt, (i, j) in enumerate(coco_loader):
+        if (i.size() != (1, 3, 512, 512)):
+            print(i.size())
+        if tt%100 == 0:
+            print(tt)
+    print("Done.")

@@ -35,29 +35,29 @@ class autoencoder(nn.Module):
             nn.ReLU(True),
         )
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(8, 8, 3, stride=2, padding=1),  # b, 8, 16, 16
+            nn.ConvTranspose2d(8, 8, 3, stride=2, padding=1, output_padding=1),  # b, 8, 16, 16
             nn.BatchNorm2d(8),
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 16, 3, stride=2, padding=1),  # b, 16, 32, 32
+            nn.ConvTranspose2d(8, 16, 3, stride=2, padding=1, output_padding=1),  # b, 16, 32, 32
             nn.BatchNorm2d(16),
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 16, 3, stride=2, padding=1),  # b, 16, 64, 32
+            nn.ConvTranspose2d(16, 16, 3, stride=2, padding=1, output_padding=1),  # b, 16, 64, 32
             nn.BatchNorm2d(16),
             nn.ReLU(True),
-            # nn.ConvTranspose2d(8, 16, 3, stride=2, padding=1),  # b, 16, 128, 32
+            # nn.ConvTranspose2d(16, 16, 3, stride=2, padding=1),  # b, 16, 128, 32
             # nn.BatchNorm2d(16),
             # nn.ReLU(True),
-            nn.ConvTranspose2d(8, 16, 3, stride=2, padding=1),  # b, 16, 256, 32
+            nn.ConvTranspose2d(16, 16, 3, stride=2, padding=1, output_padding=1),  # b, 16, 256, 32
             nn.BatchNorm2d(16),
             nn.ReLU(True),
-            nn.ConvTranspose2d(16, 8, 5, stride=2, padding=2),  # b, 8, 512, 64
+            nn.ConvTranspose2d(16, 8, 5, stride=2, padding=2, output_padding=1),  # b, 8, 512, 64
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 3, 5, stride=2, padding=2),  # b, 1, 128, 128
+            nn.ConvTranspose2d(8, 3, 5, stride=2, padding=2, output_padding=1),  # b, 1, 128, 128
             nn.Tanh()
         )
 
     def forward(self, x):
-        import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         x = self.encoder(x)
         x = self.decoder(x)
         return x
