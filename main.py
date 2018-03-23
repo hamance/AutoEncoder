@@ -9,11 +9,12 @@ from config import opt
 from data import get_loader
 from model import autoencoder
 
+import time
 
 def to_img(x):
     x = 0.5 * (x+1)
     x = x.clamp(0, 1)
-    x = x.view(x.size(0), 1, 28, 28)
+    x = x.view(x.size(0), 3, 512, 512)
     return x
 
 
@@ -34,10 +35,10 @@ def main(**kwargs):
             output = model(img)
             loss = criterion(output, img)
 
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-        
+            et = time.time()
+
         print("epoch [{}/{}], loss{:.4f}".format(epoch+1, opt.num_epochs, loss.data[0]))
 
         if epoch % 10 == 0:

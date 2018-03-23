@@ -98,7 +98,7 @@ def get_coco_loader(opt):
     ])
 
     dataset = COCO(opt.coco_dir, opt.input_json, transform=img_transform)
-    dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=16)
 
     return dataloader
 

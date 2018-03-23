@@ -18,9 +18,9 @@ class Config:
 
     learning_rate = 1e-3
 
-    coco_dir = './data/images'
+    coco_dir = 'g:\\image_caption\\zips\\coco\\2014'
 
-    input_json = './data/cocotalk.json'
+    input_json = 'g:\\image_caption\\coco\\lrt\\cocotalk.json'
 
     def parse(self, kwargs):
             u"""根据字典kwargs 更新 config参数."""
