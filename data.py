@@ -69,7 +69,7 @@ def get_mnist_loader(opt):
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
-    dataset = MNIST('./data', transform=img_transform, download=False)
+    dataset = MNIST('./mnist', transform=img_transform, download=False)
     dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True)
 
     return dataloader

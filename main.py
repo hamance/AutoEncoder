@@ -7,7 +7,7 @@ from torchvision.utils import save_image
 
 from config import opt
 from data import get_loader
-from model import autoencoder
+from model import autoencoder, autoencoder2
 
 import time
 
@@ -17,12 +17,20 @@ def to_img(x):
     x = x.view(x.size(0), 3, 512, 512)
     return x
 
+def to_img2(x):
+    x = 0.5 * (x+1)
+    x = x.clamp(0, 1)
+    x = x.view(x.size(0), 1, 28, 28)
+    return x
 
 def main(**kwargs):
     opt.parse(kwargs)
     opt.show()
     
-    model = autoencoder().cuda()
+    if opt.dataset == 'mnist':
+        model = autoencoder2().cuda()
+    else:
+        model = autoencoder().cuda()
     criterion = nn.MSELoss()
     optimizer = t.optim.Adam(model.parameters(), lr=opt.learning_rate, weight_decay=1e-5)
     dataloader = get_loader(opt)
