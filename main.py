@@ -1,5 +1,8 @@
 """Main.py"""
 
+import os
+import time
+
 import torch as t
 import torch.nn as nn
 from torch.autograd import Variable
@@ -9,7 +12,6 @@ from config import opt
 from data import get_loader
 from model import autoencoder, autoencoder2
 
-import time
 
 def to_img(x):
     x = 0.5 * (x+1)
@@ -54,7 +56,7 @@ def main(**kwargs):
 
         if epoch % 10 == 0:
             pic = to_img(output.cpu().data)
-            save_image(pic, './dc_img/img_{}.png'.format(epoch))
+            save_image(pic, os.path.join(opt.save_dir, 'img_{}.png'.format(epoch)))
 
 
 if __name__ == '__main__':

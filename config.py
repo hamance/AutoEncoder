@@ -22,6 +22,8 @@ class Config:
 
     input_json = 'g:\\image_caption\\coco\\lrt\\cocotalk.json'
 
+    save_dir = 'g:\\image_caption\\coco\\dc_img'
+
     def parse(self, kwargs):
             u"""根据字典kwargs 更新 config参数."""
             for key, val in kwargs.items():

@@ -17,19 +17,19 @@ class autoencoder(nn.Module):
             nn.Conv2d(16, 64, 5, stride=4, padding=2),  # b, 16, 32, 32
             nn.BatchNorm2d(64),
             nn.ReLU(True),
-            nn.Conv2d(64, 32, 3, stride=2, padding=1),  # b, 16, 16, 16
-            nn.BatchNorm2d(32),
+            nn.Conv2d(64, 64, 3, stride=2, padding=1),  # b, 16, 16, 16
+            nn.BatchNorm2d(64),
             nn.ReLU(True),
-            nn.Conv2d(32, 8, 3, stride=2, padding=1),  # b, 16, 8, 8
+            nn.Conv2d(64, 16, 3, stride=2, padding=1),  # b, 16, 8, 8
             # nn.BatchNorm2d(8),
             nn.ReLU(True),
         )
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(8, 32, 3, stride=2, padding=1, output_padding=1),  # b, 8, 16, 16
-            nn.BatchNorm2d(8),
+            nn.ConvTranspose2d(16, 64, 3, stride=2, padding=1, output_padding=1),  # b, 8, 16, 16
+            nn.BatchNorm2d(64),
             nn.ReLU(True),
-            nn.ConvTranspose2d(32, 64, 3, stride=2, padding=1, output_padding=1),  # b, 16, 32, 32
-            nn.BatchNorm2d(16),
+            nn.ConvTranspose2d(64, 64, 3, stride=2, padding=1, output_padding=1),  # b, 16, 32, 32
+            nn.BatchNorm2d(64),
             nn.ReLU(True),
             nn.ConvTranspose2d(64, 16, 5, stride=4, padding=2, output_padding=3),  # b, 16, 128, 128
             nn.BatchNorm2d(16),
