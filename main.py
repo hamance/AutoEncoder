@@ -37,6 +37,11 @@ def main(**kwargs):
     optimizer = t.optim.Adam(model.parameters(), lr=opt.learning_rate, weight_decay=1e-5)
     dataloader = get_loader(opt)
 
+    if opt.load_from is not None:
+        state = t.load(opt.load_from)
+        model.load_state_dict(state['state_dict'])
+        optimizer.load_state_dict(state['optimizer'])
+
     for epoch in range(opt.num_epochs):
         for ii, data in enumerate(dataloader):
             img, _ = data
@@ -56,7 +61,14 @@ def main(**kwargs):
 
         if epoch % 10 == 0:
             pic = to_img(output.cpu().data)
-            save_image(pic, os.path.join(opt.save_dir, 'img_{}.png'.format(epoch)))
+            save_image(pic, os.path.join(opt.save_dir, 'dc_img', 'img_{}.png'.format(epoch)))
+            
+            state = {
+                'epoch': epoch,
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }
+            t.save(state, os.path.join(opt.save_dir, 'model', 'ckpt_{}.pt'.format(epoch)))
 
 
 if __name__ == '__main__':
