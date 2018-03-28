@@ -59,7 +59,7 @@ def main(**kwargs):
 
         print("epoch [{}/{}], loss{:.4f}".format(epoch+1, opt.num_epochs, loss.data[0]))
 
-        if epoch % 10 == 0:
+        if epoch % 5 == 0:
             pic = to_img(output.cpu().data)
             save_image(pic, os.path.join(opt.save_dir, 'dc_img', 'img_{}.png'.format(epoch)))
             
