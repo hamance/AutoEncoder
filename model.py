@@ -34,7 +34,11 @@ class autoencoder(nn.Module):
             nn.BatchNorm2d(64),
             nn.ReLU(True),
             NoiseLayer(self.training),
-            nn.Conv2d(64, 64, 3, stride=2, padding=1),  # b, 16, 16, 16
+            nn.Conv2d(64, 128, 3, stride=2, padding=1),  # b, 16, 16, 16
+            nn.BatchNorm2d(128),
+            nn.ReLU(True),
+            NoiseLayer(self.training),
+            nn.Conv2d(128, 64, 3, stride=2, padding=1),  # b, 16, 16, 16
             nn.BatchNorm2d(64),
             nn.ReLU(True),
             NoiseLayer(self.training),
@@ -46,7 +50,10 @@ class autoencoder(nn.Module):
             nn.ConvTranspose2d(16, 64, 3, stride=2, padding=1, output_padding=1),  # b, 8, 16, 16
             nn.BatchNorm2d(64),
             nn.ReLU(True),
-            nn.ConvTranspose2d(64, 64, 3, stride=2, padding=1, output_padding=1),  # b, 16, 32, 32
+            nn.ConvTranspose2d(64, 128, 3, stride=2, padding=1, output_padding=1),  # b, 16, 32, 32
+            nn.BatchNorm2d(128),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, output_padding=1),  # b, 16, 32, 32
             nn.BatchNorm2d(64),
             nn.ReLU(True),
             nn.ConvTranspose2d(64, 16, 5, stride=4, padding=2, output_padding=3),  # b, 16, 128, 128
