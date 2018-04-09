@@ -29,7 +29,7 @@ class UpsampleConvLayer(nn.Module):
     ref: http://distill.pub/2016/deconv-checkerboard/
     """
 
-    def __init__(self, in_channels, out_channels, kernel_size, stride, upsample=None):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, upsample=None):
         super(UpsampleConvLayer, self).__init__()
         self.upsample = upsample
         if upsample:
@@ -37,7 +37,7 @@ class UpsampleConvLayer(nn.Module):
         self.reflection_padding = int(np.floor(kernel_size / 2))
         if self.reflection_padding != 0:
             self.reflection_pad = nn.ReflectionPad2d(self.reflection_padding)
-        self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size, stride)
+        self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
 
     def forward(self, x):
         if self.upsample:
@@ -90,22 +90,7 @@ class autoencoder(nn.Module):
             # nn.BatchNorm2d(3),
             nn.Tanh()
         )
-        self.decoder2 = nn.Sequential(
-            UpsampleConvLayer(32, 64, 3, stride=1, upsample=2),
-            nn.BatchNorm2d(64),
-            nn.ReLU(True),
-            UpsampleConvLayer(64, 128, 3, stride=1, upsample=2),
-            nn.BatchNorm2d(128),
-            nn.ReLU(True),
-            UpsampleConvLayer(128, 64, 3, stride=1, upsample=2),
-            nn.BatchNorm2d(64),
-            nn.ReLU(True),
-            UpsampleConvLayer(64, 16, 3, stride=1, upsample=4),
-            nn.BatchNorm2d(16),
-            nn.ReLU(True),
-            UpsampleConvLayer(16, 3, 3, stride=1, upsample=4),
-            nn.Tanh()
-        )
+        
 
     def forward(self, x):
         # import ipdb; ipdb.set_trace()
@@ -115,24 +100,82 @@ class autoencoder(nn.Module):
 
 
 
+class Linear(nn.Module):
+    ''' Simple Linear layer with xavier init '''
+    def __init__(self, d_in, d_out, bias=True):
+        super(Linear, self).__init__()
+        self.linear = nn.Linear(d_in, d_out, bias=bias)
+        init.xavier_normal(self.linear.weight)
+
+    def forward(self, x):
+        return self.linear(x)
+
+class Bottle(nn.Module):
+    ''' Perform the reshape routine before and after an operation '''
+
+    def forward(self, input):
+        if len(input.size()) <= 2:
+            return super(Bottle, self).forward(input)
+        size = input.size()[:2]
+        out = super(Bottle, self).forward(input.view(size[0]*size[1], -1))
+        return out.view(size[0], size[1], -1)
+
+class BottleLinear(Bottle, Linear):
+    ''' Perform the reshape routine before and after a linear projection '''
+    pass
+
+
+class EncodeBlock(nn.Module):
+
+    def __init__(self, d_in, d_hid, d_out, s_k, stride):
+        super(EncodeBlock, self).__init__()
+        self.block1 = nn.Sequential(
+            nn.Conv2d(d_in, d_hid, s_k, stride=stride, padding=s_k/2),
+            nn.BatchNorm2d(d_hid),
+            nn.ReLU(True)
+        )
+        self.block2 = nn.Sequential(
+            nn.Conv2d(d_hid, d_out, s_k, stride=stride, padding=s_k/2),
+            nn.BatchNorm2d(d_hid),
+            nn.ReLU(True)
+        )
+        self.block3 = nn.Sequential(
+            nn.Conv2d(d_in, d_out, 1, 1, 0),
+            nn.AvgPool2d(s_k, stride*2, padding=s_k/2)
+        )
+
+    def forward(self, x):
+        x1 = self.block1(x)
+        x2 = self.block2(x1)
+        xd = self.block3(x1)
+        return x2 + xd
+
+
+class DecodeBlock(nn.Module):
+
+    def __init__(self, d_in, d_out, s_k, stride, upsample):
+        super(DecodeBlock, self).__init__()
+        self.block = nn.Sequential(
+            UpsampleConvLayer(d_in, d_out, s_k, stride, s_k/2, upsample),
+            nn.BatchNorm2d(d_out),
+            nn.ReLU(True)
+        )
+    
+    def forward(self, x):
+        return self.block(x)
+
+
 class autoencoder2(nn.Module):
     def __init__(self):
         super(autoencoder2, self).__init__()
-        self.encoder = nn.Sequential(
-            nn.Conv2d(1, 16, 3, stride=3, padding=1),  # b, 16, 10, 10
-            nn.ReLU(True),
-            nn.MaxPool2d(2, stride=2),  # b, 16, 5, 5
-            nn.Conv2d(16, 8, 3, stride=2, padding=1),  # b, 8, 3, 3
-            nn.ReLU(True),
-            nn.MaxPool2d(2, stride=1)  # b, 8, 2, 2
+        self.encoder = nn.Sequential(                  # b, 3, 512, 512
+            EncodeBlock(3, 16, 32, 5, 2),       # b, 32, 128, 128
+            EncodeBlock(32, 16, 3, 5, 4),      # b, 3, 8, 8
         )
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(8, 16, 3, stride=2),  # b, 16, 5, 5
-            nn.ReLU(True),
-            nn.ConvTranspose2d(16, 8, 5, stride=3, padding=1),  # b, 8, 15, 15
-            nn.ReLU(True),
-            nn.ConvTranspose2d(8, 1, 2, stride=2, padding=1),  # b, 1, 28, 28
-            nn.Tanh()
+            DecodeBlock(3, 16, 5, 2, 8),    # b, 16, 32, 32
+            DecodeBlock(16, 16, 5, 2, 8),   # b, 16, 128, 128
+            DecodeBlock(16, 3, 3, 1, 4)     # b, 3, 512, 512
         )
 
     def forward(self, x):
