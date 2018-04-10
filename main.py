@@ -10,7 +10,7 @@ from torchvision.utils import save_image
 
 from config import opt
 from data import get_loader
-from model import autoencoder2 as autoencoder
+from model import autoencoder as autoencoder
 
 
 def to_img(x):

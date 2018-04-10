@@ -138,12 +138,12 @@ class EncodeBlock(nn.Module):
         )
         self.block2 = nn.Sequential(
             nn.Conv2d(d_hid, d_out, s_k, stride=stride, padding=math.floor(s_k/2)),
-            nn.BatchNorm2d(d_hid),
+            nn.BatchNorm2d(d_out),
             nn.ReLU(True)
         )
         self.block3 = nn.Sequential(
             nn.Conv2d(d_in, d_out, 1, 1, 0),
-            nn.AvgPool2d(s_k, stride*2, padding=math.floor(s_k/2))
+            nn.AvgPool2d(s_k, stride**2, padding=math.floor(s_k/2))
         )
 
     def forward(self, x):
