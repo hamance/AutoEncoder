@@ -1,5 +1,7 @@
 """Model definition."""
 
+import math
+
 import numpy as np
 import torch as t
 import torch.nn as nn
@@ -130,18 +132,18 @@ class EncodeBlock(nn.Module):
     def __init__(self, d_in, d_hid, d_out, s_k, stride):
         super(EncodeBlock, self).__init__()
         self.block1 = nn.Sequential(
-            nn.Conv2d(d_in, d_hid, s_k, stride=stride, padding=s_k/2),
+            nn.Conv2d(d_in, d_hid, s_k, stride=stride, padding=math.floor(s_k/2)),
             nn.BatchNorm2d(d_hid),
             nn.ReLU(True)
         )
         self.block2 = nn.Sequential(
-            nn.Conv2d(d_hid, d_out, s_k, stride=stride, padding=s_k/2),
+            nn.Conv2d(d_hid, d_out, s_k, stride=stride, padding=math.floor(s_k/2)),
             nn.BatchNorm2d(d_hid),
             nn.ReLU(True)
         )
         self.block3 = nn.Sequential(
             nn.Conv2d(d_in, d_out, 1, 1, 0),
-            nn.AvgPool2d(s_k, stride*2, padding=s_k/2)
+            nn.AvgPool2d(s_k, stride*2, padding=math.floor(s_k/2))
         )
 
     def forward(self, x):
@@ -156,7 +158,7 @@ class DecodeBlock(nn.Module):
     def __init__(self, d_in, d_out, s_k, stride, upsample):
         super(DecodeBlock, self).__init__()
         self.block = nn.Sequential(
-            UpsampleConvLayer(d_in, d_out, s_k, stride, s_k/2, upsample),
+            UpsampleConvLayer(d_in, d_out, s_k, stride, math.floor(s_k/2), upsample),
             nn.BatchNorm2d(d_out),
             nn.ReLU(True)
         )
